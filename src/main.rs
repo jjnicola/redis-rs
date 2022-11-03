@@ -61,7 +61,7 @@ impl RedisCtx {
             }
             Err(e) => {return Err(e)}
         }
-        fn max_db_index_to_uint (res: Vec<String>) -> u32 {
+       fn max_db_index_to_uint (res: Vec<String>) -> u32 {
             if res.len() == 2 {
                 match res[1].to_string().parse::<u32>() {
                     Ok(m) => {return m}
@@ -72,6 +72,18 @@ impl RedisCtx {
                 }
             }
             return 0 as u32
+        }
+    }
+
+    fn select(&mut self, db_index: u32) -> Result<String, RedisError> {
+        let s = Cmd::new()
+            .arg("SELECT")
+            .arg(db_index.to_string())
+            .query(&mut self.kb);
+
+        match s {
+            Ok(ok) => {return Ok(ok)}
+            Err(e) => {return Err(e)}
         }
     }
     
@@ -125,4 +137,10 @@ fn main() {
         println! ("Is initialized");
     }
 
+    let r = nvtcache.cache.select(1);
+    match r {
+        Ok(ok) => println!("Select 1 {}", ok),
+        Err(e) => println!("Error:{}",e)
+    }
+    
 }
