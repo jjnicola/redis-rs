@@ -27,13 +27,13 @@ enum KbNvtPos {
 }
 
 type Result<T> = std::result::Result<T, DbError>;
- 
+
 #[derive(Debug)]
 enum DbError {
     RedisErr(RedisError),
     CustomErr(String),
 }
- 
+
 impl fmt::Display for DbError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &*self {
@@ -42,12 +42,12 @@ impl fmt::Display for DbError {
         }
     }
 }
- 
+
 impl error::Error for DbError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             DbError::RedisErr(ref e) => Some(e),
-            DbError::CustomErr(_) => None
+            DbError::CustomErr(_) => None,
         }
     }
 }
@@ -97,7 +97,11 @@ impl RedisCtx {
                 self.maxdb = max_db_index_to_uint(res);
                 return Ok(self.maxdb);
             }
-            Err(_) => return Err(DbError::CustomErr(String::from("Not possible to select a free database."))),
+            Err(_) => {
+                return Err(DbError::CustomErr(String::from(
+                    "Not possible to select a free database.",
+                )))
+            }
         }
 
         fn max_db_index_to_uint(res: Vec<String>) -> u32 {
@@ -114,7 +118,7 @@ impl RedisCtx {
         }
     }
 
-    fn set_namespace (&mut self, db_index: u32) -> Result<String> {
+    fn set_namespace(&mut self, db_index: u32) -> Result<String> {
         let s = Cmd::new()
             .arg("SELECT")
             .arg(db_index.to_string())
@@ -123,12 +127,15 @@ impl RedisCtx {
         match s {
             Ok(ok) => {
                 self.db = db_index;
-                return Ok(ok)
-            },
-            Err(_) => return Err(DbError::CustomErr(String::from("Not possible to set a namespace.")))
+                return Ok(ok);
+            }
+            Err(_) => {
+                return Err(DbError::CustomErr(String::from(
+                    "Not possible to set a namespace.",
+                )))
+            }
         }
     }
-
 
     fn try_database(&mut self, dbi: u32) -> Result<u32> {
         return Ok(1);
@@ -145,19 +152,20 @@ impl RedisCtx {
                         match self.set_namespace(i) {
                             Ok(_) => (),
                             Err(e) => {
-                                println!("Error: {}",e);
+                                println!("Error: {}", e);
                                 break;
                             }
                         }
-                        return Ok(self.db)
-                    },
+                        return Ok(self.db);
+                    }
                     Err(_) => continue,
                 }
             }
         }
-        return Err(DbError::CustomErr(String::from("Not possible to select a free database.")));
+        return Err(DbError::CustomErr(String::from(
+            "Not possible to select a free database.",
+        )));
     }
-
 
     fn redis_set_key_int(&mut self, key: &str, val: i32) -> Result<()> {
         let _: () = self.kb.set(key, val)?;
@@ -166,8 +174,8 @@ impl RedisCtx {
 
     fn redis_get_int(&mut self, key: &str) -> String {
         match self.kb.get(key) {
-            Ok(x) => {return x},
-            Err(e) => e.to_string()
+            Ok(x) => return x,
+            Err(e) => e.to_string(),
         }
     }
 }
@@ -180,10 +188,9 @@ impl NvtCache {
         let kbi = rctx.select_database()?;
         Ok(NvtCache {
             cache: rctx,
-            init: true
+            init: true,
         })
     }
-
 
     fn is_init(&mut self) -> bool {
         self.init == true
