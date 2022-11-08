@@ -1,9 +1,9 @@
 pub mod nvtcache {
 
-//    use super::*;
-    use crate::redisconnector::redisconnector::*;
+    //    use super::*;
     use crate::dberror::dberror::Result;
-    
+    use crate::redisconnector::redisconnector::*;
+
     pub struct NvtCache {
         pub cache: RedisCtx,
         pub init: bool,
@@ -25,5 +25,4 @@ pub mod nvtcache {
             self.init == true
         }
     }
-
 }

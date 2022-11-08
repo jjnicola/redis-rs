@@ -5,7 +5,7 @@ use std::fmt;
 
 pub mod dberror {
     use super::*;
-    
+
     pub type Result<T> = std::result::Result<T, DbError>;
 
     #[derive(Debug)]

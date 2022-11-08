@@ -3,22 +3,19 @@ use redis::*;
 //use std::error::Error;
 //use std::fmt;
 
-
 const GLOBAL_DBINDEX_NAME: &str = "GVM.__GlobalDBIndex";
 const REDIS_DEFAULT_PATH: &str = "unix:///run/redis/redis-server.sock";
 const NVTCACHE: &str = "nvticache";
 
-
 pub mod redisconnector {
     use super::*;
-    use crate::dberror::dberror::Result;
     use crate::dberror::dberror::DbError;
-    
-    
+    use crate::dberror::dberror::Result;
+
     pub struct RedisCtx {
         pub kb: Connection, //a redis connection
-        db: u32,        // the name space
-        maxdb: u32,     // max db index
+        db: u32,            // the name space
+        maxdb: u32,         // max db index
     }
 
     impl RedisCtx {
@@ -73,7 +70,6 @@ pub mod redisconnector {
         pub fn get_namespace(&mut self) -> Result<u32> {
             let db: u32 = self.db;
             Ok(db)
-            
         }
         pub fn set_namespace(&mut self, db_index: u32) -> Result<String> {
             let s = Cmd::new()
@@ -136,5 +132,4 @@ pub mod redisconnector {
             }
         }
     }
-
 }
