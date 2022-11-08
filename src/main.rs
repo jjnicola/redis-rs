@@ -1,7 +1,7 @@
 use redis::*;
 use std::error;
+use std::error::Error;
 use std::fmt;
-
 
 const GLOBAL_DBINDEX_NAME: &str = "GVM.__GlobalDBIndex";
 const REDIS_DEFAULT_PATH: &str = "unix:///run/redis-openvas/redis.sock";
@@ -205,6 +205,10 @@ fn main() {
         Ok(nc) => nvtcache = nc,
         Err(e) => {
             println!("{}", e);
+            if let Some(source) = e.source() {
+                println!("{}", source);
+            }
+
             panic!("Error")
         }
     }
